@@ -1,0 +1,41 @@
+{
+  "name": "shopsphere",
+  "version": "1.0.0",
+  "description": "Full Stack MERN E-commerce Platform",
+  "main": "index.js",
+  "scripts": {
+    "start": "node backend/server.js",
+    "server": "nodemon backend/server.js",
+    "client": "npm run dev --prefix frontend",
+    "dev": "concurrently \"npm run server\" \"npm run client\"",
+    "install-all": "npm install && cd backend && npm install && cd ../frontend && npm install",
+    "build": "cd frontend && npm run build",
+    "heroku-postbuild": "NPM_CONFIG_PRODUCTION=false npm run build"
+  },
+  "keywords": [
+    "ecommerce",
+    "mern",
+    "react",
+    "nodejs",
+    "mongodb"
+  ],
+  "author": "ShopSphere Team",
+  "license": "MIT",
+  "devDependencies": {
+    "concurrently": "^8.2.2",
+    "nodemon": "^3.1.11"
+  },
+  "dependencies": {
+    "bcryptjs": "^3.0.3",
+    "cookie-parser": "^1.4.7",
+    "cors": "^2.8.6",
+    "dotenv": "^17.3.1",
+    "express": "^5.2.1",
+    "express-rate-limit": "^8.2.1",
+    "express-validator": "^7.3.1",
+    "helmet": "^8.1.0",
+    "jsonwebtoken": "^9.0.3",
+    "mongoose": "^9.2.1",
+    "morgan": "^1.10.1"
+  }
+}
