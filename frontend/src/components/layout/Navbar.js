@@ -1,9 +1,27 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
-import { FiShoppingCart, FiUser, FiMenu, FiX, FiSearch } from "react-icons/fi";
+import { Link, useNavigate } from "react-router-dom";
+import {
+  FiShoppingCart,
+  FiUser,
+  FiMenu,
+  FiX,
+  FiSearch,
+  FiLogOut,
+  FiSettings,
+} from "react-icons/fi";
+import { useAuth } from "../../context/AuthContext";
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const { user, isAuthenticated, isAdmin, logout } = useAuth();
+  const navigate = useNavigate();
+
+  const handleLogout = async () => {
+    await logout();
+    navigate("/");
+    setIsProfileOpen(false);
+  };
 
   return (
     <nav className="bg-white shadow-md sticky top-0 z-50">
@@ -32,6 +50,7 @@ const Navbar = () => {
             >
               Products
             </Link>
+
             <Link
               to="/cart"
               className="relative text-gray-600 hover:text-primary-600"
@@ -41,9 +60,55 @@ const Navbar = () => {
                 0
               </span>
             </Link>
-            <Link to="/login" className="btn-primary">
-              Login
-            </Link>
+
+            {isAuthenticated ? (
+              <div className="relative">
+                <button
+                  onClick={() => setIsProfileOpen(!isProfileOpen)}
+                  className="flex items-center space-x-2 text-gray-600 hover:text-primary-600"
+                >
+                  <div className="w-8 h-8 bg-primary-100 rounded-full flex items-center justify-center">
+                    <FiUser className="text-primary-600" />
+                  </div>
+                  <span className="font-medium">
+                    {user?.name?.split(" ")[0]}
+                  </span>
+                </button>
+
+                {isProfileOpen && (
+                  <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg py-2 z-50">
+                    <Link
+                      to="/profile"
+                      onClick={() => setIsProfileOpen(false)}
+                      className="flex items-center px-4 py-2 text-gray-700 hover:bg-gray-100"
+                    >
+                      <FiUser className="mr-2" /> Profile
+                    </Link>
+
+                    {isAdmin && (
+                      <Link
+                        to="/admin"
+                        onClick={() => setIsProfileOpen(false)}
+                        className="flex items-center px-4 py-2 text-gray-700 hover:bg-gray-100"
+                      >
+                        <FiSettings className="mr-2" /> Admin Dashboard
+                      </Link>
+                    )}
+
+                    <button
+                      onClick={handleLogout}
+                      className="flex items-center w-full px-4 py-2 text-gray-700 hover:bg-gray-100"
+                    >
+                      <FiLogOut className="mr-2" /> Logout
+                    </button>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <Link to="/login" className="btn-primary">
+                Login
+              </Link>
+            )}
           </div>
 
           <button
@@ -59,19 +124,56 @@ const Navbar = () => {
             <div className="flex flex-col space-y-4">
               <Link
                 to="/products"
+                onClick={() => setIsMenuOpen(false)}
                 className="text-gray-600 hover:text-primary-600 font-medium"
               >
                 Products
               </Link>
               <Link
                 to="/cart"
+                onClick={() => setIsMenuOpen(false)}
                 className="text-gray-600 hover:text-primary-600 font-medium"
               >
                 Cart (0)
               </Link>
-              <Link to="/login" className="btn-primary text-center">
-                Login
-              </Link>
+
+              {isAuthenticated ? (
+                <>
+                  <Link
+                    to="/profile"
+                    onClick={() => setIsMenuOpen(false)}
+                    className="text-gray-600 hover:text-primary-600 font-medium"
+                  >
+                    Profile
+                  </Link>
+                  {isAdmin && (
+                    <Link
+                      to="/admin"
+                      onClick={() => setIsMenuOpen(false)}
+                      className="text-gray-600 hover:text-primary-600 font-medium"
+                    >
+                      Admin Dashboard
+                    </Link>
+                  )}
+                  <button
+                    onClick={() => {
+                      handleLogout();
+                      setIsMenuOpen(false);
+                    }}
+                    className="text-left text-gray-600 hover:text-primary-600 font-medium"
+                  >
+                    Logout
+                  </button>
+                </>
+              ) : (
+                <Link
+                  to="/login"
+                  onClick={() => setIsMenuOpen(false)}
+                  className="btn-primary text-center"
+                >
+                  Login
+                </Link>
+              )}
             </div>
           </div>
         )}
