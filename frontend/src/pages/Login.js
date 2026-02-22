@@ -1,18 +1,38 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { FiMail, FiLock, FiEye, FiEyeOff } from "react-icons/fi";
+import { toast } from "react-toastify";
+import { useAuth } from "../context/AuthContext";
 
 const Login = () => {
   const [formData, setFormData] = useState({ email: "", password: "" });
   const [showPassword, setShowPassword] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+
+  const { login } = useAuth();
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  const from = location.state?.from?.pathname || "/";
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Login:", formData);
+    setIsLoading(true);
+
+    const result = await login(formData.email, formData.password);
+
+    if (result.success) {
+      toast.success("Welcome back!");
+      navigate(from, { replace: true });
+    } else {
+      toast.error(result.message);
+    }
+
+    setIsLoading(false);
   };
 
   return (
@@ -41,6 +61,7 @@ const Login = () => {
                   placeholder="Enter your email"
                   className="input-field pl-10"
                   required
+                  disabled={isLoading}
                 />
               </div>
             </div>
@@ -59,6 +80,7 @@ const Login = () => {
                   placeholder="Enter your password"
                   className="input-field pl-10 pr-10"
                   required
+                  disabled={isLoading}
                 />
                 <button
                   type="button"
@@ -83,8 +105,12 @@ const Login = () => {
               </Link>
             </div>
 
-            <button type="submit" className="w-full btn-primary py-3">
-              Sign In
+            <button
+              type="submit"
+              disabled={isLoading}
+              className="w-full btn-primary py-3 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {isLoading ? "Signing in..." : "Sign In"}
             </button>
           </form>
 
