@@ -1,6 +1,8 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { FiUser, FiMail, FiLock, FiEye, FiEyeOff } from "react-icons/fi";
+import { toast } from "react-toastify";
+import { useAuth } from "../context/AuthContext";
 
 const Register = () => {
   const [formData, setFormData] = useState({
@@ -10,18 +12,44 @@ const Register = () => {
     confirmPassword: "",
   });
   const [showPassword, setShowPassword] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+
+  const { register } = useAuth();
+  const navigate = useNavigate();
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+
     if (formData.password !== formData.confirmPassword) {
-      alert("Passwords do not match");
+      toast.error("Passwords do not match");
       return;
     }
-    console.log("Register:", formData);
+
+    if (formData.password.length < 6) {
+      toast.error("Password must be at least 6 characters");
+      return;
+    }
+
+    setIsLoading(true);
+
+    const result = await register(
+      formData.name,
+      formData.email,
+      formData.password,
+    );
+
+    if (result.success) {
+      toast.success("Account created successfully!");
+      navigate("/");
+    } else {
+      toast.error(result.message);
+    }
+
+    setIsLoading(false);
   };
 
   return (
@@ -48,6 +76,7 @@ const Register = () => {
                   placeholder="Enter your name"
                   className="input-field pl-10"
                   required
+                  disabled={isLoading}
                 />
               </div>
             </div>
@@ -66,6 +95,7 @@ const Register = () => {
                   placeholder="Enter your email"
                   className="input-field pl-10"
                   required
+                  disabled={isLoading}
                 />
               </div>
             </div>
@@ -84,6 +114,7 @@ const Register = () => {
                   placeholder="Create a password"
                   className="input-field pl-10 pr-10"
                   required
+                  disabled={isLoading}
                 />
                 <button
                   type="button"
@@ -109,12 +140,17 @@ const Register = () => {
                   placeholder="Confirm your password"
                   className="input-field pl-10"
                   required
+                  disabled={isLoading}
                 />
               </div>
             </div>
 
-            <button type="submit" className="w-full btn-primary py-3">
-              Create Account
+            <button
+              type="submit"
+              disabled={isLoading}
+              className="w-full btn-primary py-3 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {isLoading ? "Creating Account..." : "Create Account"}
             </button>
           </form>
 
