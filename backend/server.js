@@ -23,6 +23,8 @@ app.use(cookieParser());
 
 app.use("/api/auth", require("./routes/authRoutes"));
 app.use("/api/users", require("./routes/userRoutes"));
+app.use("/api/products", require("./routes/productRoutes"));
+app.use("/api/wishlist", require("./routes/wishlistRoutes"));
 
 app.get("/", (req, res) => {
   res.json({ message: "ShopSphere API is running" });
