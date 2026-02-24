@@ -25,6 +25,10 @@ app.use("/api/auth", require("./routes/authRoutes"));
 app.use("/api/users", require("./routes/userRoutes"));
 app.use("/api/products", require("./routes/productRoutes"));
 app.use("/api/wishlist", require("./routes/wishlistRoutes"));
+app.use("/api/cart", require("./routes/cartRoutes"));
+app.use("/api/orders", require("./routes/orderRoutes"));
+app.use("/api/discounts", require("./routes/discountRoutes"));
+app.use("/api/stats", require("./routes/statsRoutes"));
 
 app.get("/", (req, res) => {
   res.json({ message: "ShopSphere API is running" });
