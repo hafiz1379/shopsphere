@@ -8,13 +8,18 @@ import {
   FiSearch,
   FiLogOut,
   FiSettings,
+  FiHeart,
 } from "react-icons/fi";
 import { useAuth } from "../../context/AuthContext";
+import { useCart } from "../../context/CartContext";
+import { useWishlist } from "../../context/WishlistContext";
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const { user, isAuthenticated, isAdmin, logout } = useAuth();
+  const { cartCount } = useCart();
+  const { wishlistCount } = useWishlist();
   const navigate = useNavigate();
 
   const handleLogout = async () => {
@@ -51,14 +56,30 @@ const Navbar = () => {
               Products
             </Link>
 
+            {isAuthenticated && (
+              <Link
+                to="/profile"
+                className="relative text-gray-600 hover:text-primary-600"
+              >
+                <FiHeart size={24} />
+                {wishlistCount > 0 && (
+                  <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                    {wishlistCount}
+                  </span>
+                )}
+              </Link>
+            )}
+
             <Link
               to="/cart"
               className="relative text-gray-600 hover:text-primary-600"
             >
               <FiShoppingCart size={24} />
-              <span className="absolute -top-2 -right-2 bg-primary-600 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
-                0
-              </span>
+              {cartCount > 0 && (
+                <span className="absolute -top-2 -right-2 bg-primary-600 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                  {cartCount}
+                </span>
+              )}
             </Link>
 
             {isAuthenticated ? (
@@ -134,9 +155,8 @@ const Navbar = () => {
                 onClick={() => setIsMenuOpen(false)}
                 className="text-gray-600 hover:text-primary-600 font-medium"
               >
-                Cart (0)
+                Cart ({cartCount})
               </Link>
-
               {isAuthenticated ? (
                 <>
                   <Link
