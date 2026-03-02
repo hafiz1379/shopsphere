@@ -25,6 +25,14 @@ import AdminOrders from "./pages/admin/AdminOrders";
 import AdminUsers from "./pages/admin/AdminUsers";
 import AdminDiscounts from "./pages/admin/AdminDiscounts";
 
+const StorefrontLayout = ({ children }) => (
+  <div className="flex flex-col min-h-screen">
+    <Navbar />
+    <main className="flex-grow">{children}</main>
+    <Footer />
+  </div>
+);
+
 function App() {
   return (
     <AuthProvider>
@@ -33,7 +41,7 @@ function App() {
           <Router>
             <Routes>
               <Route
-                path="/admin/*"
+                path="/admin"
                 element={
                   <ProtectedRoute adminOnly>
                     <AdminLayout />
@@ -48,50 +56,89 @@ function App() {
               </Route>
 
               <Route
-                path="/*"
+                path="/"
                 element={
-                  <div className="flex flex-col min-h-screen">
-                    <Navbar />
-                    <main className="flex-grow">
-                      <Routes>
-                        <Route path="/" element={<Home />} />
-                        <Route path="/products" element={<Products />} />
-                        <Route
-                          path="/products/:id"
-                          element={<ProductDetail />}
-                        />
-                        <Route path="/login" element={<Login />} />
-                        <Route path="/register" element={<Register />} />
-                        <Route path="/cart" element={<Cart />} />
-                        <Route
-                          path="/profile"
-                          element={
-                            <ProtectedRoute>
-                              <Profile />
-                            </ProtectedRoute>
-                          }
-                        />
-                        <Route
-                          path="/checkout"
-                          element={
-                            <ProtectedRoute>
-                              <Checkout />
-                            </ProtectedRoute>
-                          }
-                        />
-                        <Route
-                          path="/orders/:id"
-                          element={
-                            <ProtectedRoute>
-                              <OrderDetail />
-                            </ProtectedRoute>
-                          }
-                        />
-                        <Route path="*" element={<NotFound />} />
-                      </Routes>
-                    </main>
-                    <Footer />
-                  </div>
+                  <StorefrontLayout>
+                    <Home />
+                  </StorefrontLayout>
+                }
+              />
+              <Route
+                path="/products"
+                element={
+                  <StorefrontLayout>
+                    <Products />
+                  </StorefrontLayout>
+                }
+              />
+              <Route
+                path="/products/:id"
+                element={
+                  <StorefrontLayout>
+                    <ProductDetail />
+                  </StorefrontLayout>
+                }
+              />
+              <Route
+                path="/login"
+                element={
+                  <StorefrontLayout>
+                    <Login />
+                  </StorefrontLayout>
+                }
+              />
+              <Route
+                path="/register"
+                element={
+                  <StorefrontLayout>
+                    <Register />
+                  </StorefrontLayout>
+                }
+              />
+              <Route
+                path="/cart"
+                element={
+                  <StorefrontLayout>
+                    <Cart />
+                  </StorefrontLayout>
+                }
+              />
+              <Route
+                path="/profile"
+                element={
+                  <StorefrontLayout>
+                    <ProtectedRoute>
+                      <Profile />
+                    </ProtectedRoute>
+                  </StorefrontLayout>
+                }
+              />
+              <Route
+                path="/checkout"
+                element={
+                  <StorefrontLayout>
+                    <ProtectedRoute>
+                      <Checkout />
+                    </ProtectedRoute>
+                  </StorefrontLayout>
+                }
+              />
+              <Route
+                path="/orders/:id"
+                element={
+                  <StorefrontLayout>
+                    <ProtectedRoute>
+                      <OrderDetail />
+                    </ProtectedRoute>
+                  </StorefrontLayout>
+                }
+              />
+              <Route
+                path="*"
+                element={
+                  <StorefrontLayout>
+                    <NotFound />
+                  </StorefrontLayout>
                 }
               />
             </Routes>

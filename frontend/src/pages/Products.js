@@ -1,16 +1,20 @@
 import React, { useState, useEffect } from "react";
+import { useSearchParams } from "react-router-dom";
 import { FiFilter, FiGrid, FiList, FiSearch, FiX } from "react-icons/fi";
 import ProductCard from "../components/common/ProductCard";
 import Loading from "../components/common/Loading";
 import { productAPI } from "../services/api";
 
 const Products = () => {
+  const [searchParams] = useSearchParams();
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [viewMode, setViewMode] = useState("grid");
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [sortBy, setSortBy] = useState("newest");
-  const [searchQuery, setSearchQuery] = useState("");
+  const [searchQuery, setSearchQuery] = useState(
+    searchParams.get("search") || "",
+  );
   const [showFilters, setShowFilters] = useState(false);
   const [priceRange, setPriceRange] = useState({ min: "", max: "" });
   const [pagination, setPagination] = useState({
@@ -29,9 +33,20 @@ const Products = () => {
     "Accessories",
   ];
 
+  // Sync searchQuery state with URL parameters (e.g., from header search)
+  useEffect(() => {
+    const urlSearch = searchParams.get("search");
+    if (urlSearch) {
+      setSearchQuery(urlSearch);
+      // Ensure pagination resets when a new search comes from the URL
+      setPagination((prev) => ({ ...prev, page: 1 }));
+    }
+  }, [searchParams]);
+
   useEffect(() => {
     fetchProducts();
-  }, [selectedCategory, sortBy, pagination.page]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedCategory, sortBy, pagination.page, searchQuery]);
 
   const fetchProducts = async () => {
     try {
@@ -70,12 +85,12 @@ const Products = () => {
 
   const handleSearch = (e) => {
     e.preventDefault();
-    setPagination({ ...pagination, page: 1 });
+    setPagination((prev) => ({ ...prev, page: 1 }));
     fetchProducts();
   };
 
   const handlePriceFilter = () => {
-    setPagination({ ...pagination, page: 1 });
+    setPagination((prev) => ({ ...prev, page: 1 }));
     fetchProducts();
   };
 
@@ -84,7 +99,7 @@ const Products = () => {
     setSearchQuery("");
     setPriceRange({ min: "", max: "" });
     setSortBy("newest");
-    setPagination({ ...pagination, page: 1 });
+    setPagination((prev) => ({ ...prev, page: 1 }));
   };
 
   return (
@@ -130,7 +145,7 @@ const Products = () => {
                     <button
                       onClick={() => {
                         setSelectedCategory(category);
-                        setPagination({ ...pagination, page: 1 });
+                        setPagination((prev) => ({ ...prev, page: 1 }));
                       }}
                       className={`w-full text-left px-3 py-2 rounded-lg transition-colors ${
                         selectedCategory === category

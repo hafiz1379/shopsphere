@@ -1,17 +1,37 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { FiTruck, FiShield, FiRefreshCw, FiHeadphones } from "react-icons/fi";
 import ProductCard from "../components/common/ProductCard";
-import products from "../data/products";
+import Loading from "../components/common/Loading";
+import { productAPI } from "../services/api";
 
 const Home = () => {
-  const featuredProducts = products.slice(0, 4);
+  const [featuredProducts, setFeaturedProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetchFeaturedProducts();
+  }, []);
+
+  const fetchFeaturedProducts = async () => {
+    try {
+      const { data } = await productAPI.getAll({
+        featured: "true",
+        limit: 4,
+      });
+      setFeaturedProducts(data.data);
+    } catch (error) {
+      console.error("Error fetching products:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const features = [
     {
       icon: FiTruck,
       title: "Free Shipping",
-      description: "On orders over $50",
+      description: "On orders over $100",
     },
     {
       icon: FiShield,
@@ -98,11 +118,19 @@ const Home = () => {
               View All →
             </Link>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {featuredProducts.map((product) => (
-              <ProductCard key={product.id} product={product} />
-            ))}
-          </div>
+          {loading ? (
+            <Loading />
+          ) : featuredProducts.length > 0 ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+              {featuredProducts.map((product) => (
+                <ProductCard key={product._id} product={product} />
+              ))}
+            </div>
+          ) : (
+            <p className="text-center text-gray-500 py-12">
+              No featured products available yet.
+            </p>
+          )}
         </div>
       </section>
 

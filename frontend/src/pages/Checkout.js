@@ -12,7 +12,7 @@ import { toast } from "react-toastify";
 import { useCart } from "../context/CartContext";
 import { orderAPI } from "../services/api";
 
-const stripePromise = loadStripe("pk_test_your_stripe_publishable_key");
+const stripePromise = loadStripe(process.env.REACT_APP_STRIPE_PUBLISHABLE_KEY);
 
 const CheckoutForm = ({ order, onSuccess }) => {
   const stripe = useStripe();

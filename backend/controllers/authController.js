@@ -1,6 +1,7 @@
 const User = require("../models/User");
 const generateToken = require("../utils/generateToken");
 
+// ──────────── Register ────────────
 const register = async (req, res) => {
   try {
     const { name, email, password } = req.body;
@@ -13,12 +14,7 @@ const register = async (req, res) => {
       });
     }
 
-    const user = await User.create({
-      name,
-      email,
-      password,
-    });
-
+    const user = await User.create({ name, email, password });
     const token = generateToken(user._id);
 
     res.cookie("token", token, {
@@ -46,6 +42,7 @@ const register = async (req, res) => {
   }
 };
 
+// ──────────── Login ────────────
 const login = async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -93,6 +90,7 @@ const login = async (req, res) => {
   }
 };
 
+// ──────────── Logout ────────────
 const logout = async (req, res) => {
   res.cookie("token", "", {
     httpOnly: true,
@@ -105,10 +103,10 @@ const logout = async (req, res) => {
   });
 };
 
+// ──────────── Get Me ────────────
 const getMe = async (req, res) => {
   try {
     const user = await User.findById(req.user._id);
-
     res.status(200).json({
       success: true,
       data: user,
@@ -121,4 +119,89 @@ const getMe = async (req, res) => {
   }
 };
 
-module.exports = { register, login, logout, getMe };
+// ──────────── Update Profile ────────────
+const updateProfile = async (req, res) => {
+  try {
+    const { name, email } = req.body;
+
+    const user = await User.findById(req.user._id);
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found",
+      });
+    }
+
+    if (email && email !== user.email) {
+      const emailExists = await User.findOne({ email });
+      if (emailExists) {
+        return res.status(400).json({
+          success: false,
+          message: "Email already in use",
+        });
+      }
+    }
+
+    user.name = name || user.name;
+    user.email = email || user.email;
+
+    const updatedUser = await user.save();
+
+    res.status(200).json({
+      success: true,
+      data: {
+        _id: updatedUser._id,
+        name: updatedUser.name,
+        email: updatedUser.email,
+        role: updatedUser.role,
+      },
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+// ──────────── Update Password ────────────
+const updatePassword = async (req, res) => {
+  try {
+    const { currentPassword, newPassword } = req.body;
+
+    const user = await User.findById(req.user._id).select("+password");
+
+    if (!(await user.matchPassword(currentPassword))) {
+      return res.status(401).json({
+        success: false,
+        message: "Current password is incorrect",
+      });
+    }
+
+    user.password = newPassword;
+    await user.save();
+
+    const token = generateToken(user._id);
+
+    res.status(200).json({
+      success: true,
+      message: "Password updated successfully",
+      token,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+module.exports = {
+  register,
+  login,
+  logout,
+  getMe,
+  updateProfile,
+  updatePassword,
+};

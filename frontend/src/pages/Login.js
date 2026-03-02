@@ -97,12 +97,6 @@ const Login = () => {
                 <input type="checkbox" className="rounded text-primary-600" />
                 <span className="ml-2 text-gray-600 text-sm">Remember me</span>
               </label>
-              <Link
-                to="/forgot-password"
-                className="text-primary-600 text-sm hover:underline"
-              >
-                Forgot password?
-              </Link>
             </div>
 
             <button
