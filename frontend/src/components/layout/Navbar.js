@@ -17,6 +17,8 @@ import { useWishlist } from "../../context/WishlistContext";
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+
   const { user, isAuthenticated, isAdmin, logout } = useAuth();
   const { cartCount } = useCart();
   const { wishlistCount } = useWishlist();
@@ -26,6 +28,15 @@ const Navbar = () => {
     await logout();
     navigate("/");
     setIsProfileOpen(false);
+  };
+
+  const handleSearch = (e) => {
+    e.preventDefault();
+    if (searchQuery.trim()) {
+      navigate(`/products?search=${encodeURIComponent(searchQuery.trim())}`);
+      setSearchQuery("");
+      setIsMenuOpen(false);
+    }
   };
 
   return (
@@ -38,14 +49,21 @@ const Navbar = () => {
           </Link>
 
           <div className="hidden md:flex items-center flex-1 max-w-md mx-8">
-            <div className="relative w-full">
+            <form onSubmit={handleSearch} className="relative w-full">
               <input
                 type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Search products..."
                 className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-primary-500"
               />
-              <FiSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
-            </div>
+              <button
+                type="submit"
+                className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-primary-600"
+              >
+                <FiSearch />
+              </button>
+            </form>
           </div>
 
           <div className="hidden md:flex items-center space-x-6">
@@ -105,7 +123,6 @@ const Navbar = () => {
                     >
                       <FiUser className="mr-2" /> Profile
                     </Link>
-
                     {isAdmin && (
                       <Link
                         to="/admin"
@@ -115,7 +132,6 @@ const Navbar = () => {
                         <FiSettings className="mr-2" /> Admin Dashboard
                       </Link>
                     )}
-
                     <button
                       onClick={handleLogout}
                       className="flex items-center w-full px-4 py-2 text-gray-700 hover:bg-gray-100"
@@ -142,6 +158,23 @@ const Navbar = () => {
 
         {isMenuOpen && (
           <div className="md:hidden py-4 border-t">
+            <form onSubmit={handleSearch} className="mb-4">
+              <div className="relative">
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder="Search products..."
+                  className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-primary-500"
+                />
+                <button
+                  type="submit"
+                  className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
+                >
+                  <FiSearch />
+                </button>
+              </div>
+            </form>
             <div className="flex flex-col space-y-4">
               <Link
                 to="/products"
