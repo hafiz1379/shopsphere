@@ -77,6 +77,7 @@ const Register = () => {
                   className="input-field pl-10"
                   required
                   disabled={isLoading}
+                  autoComplete="name"
                 />
               </div>
             </div>
@@ -96,6 +97,7 @@ const Register = () => {
                   className="input-field pl-10"
                   required
                   disabled={isLoading}
+                  autoComplete="email"
                 />
               </div>
             </div>
@@ -115,6 +117,7 @@ const Register = () => {
                   className="input-field pl-10 pr-10"
                   required
                   disabled={isLoading}
+                  autoComplete="new-password"
                 />
                 <button
                   type="button"
@@ -141,6 +144,7 @@ const Register = () => {
                   className="input-field pl-10"
                   required
                   disabled={isLoading}
+                  autoComplete="new-password"
                 />
               </div>
             </div>
