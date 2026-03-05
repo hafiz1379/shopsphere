@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { FiEdit2, FiTrash2, FiSearch, FiX } from "react-icons/fi";
+import { FiEdit2, FiTrash2, FiX } from "react-icons/fi";
 import { toast } from "react-toastify";
 import { userAPI } from "../../services/api";
 import Loading from "../../components/common/Loading";
