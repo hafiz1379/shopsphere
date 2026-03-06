@@ -167,34 +167,44 @@ const Profile = () => {
                 </h2>
                 <form onSubmit={handleProfileSubmit} className="space-y-6">
                   <div>
-                    <label className="block text-gray-700 font-medium mb-2">
+                    <label
+                      htmlFor="profile-name"
+                      className="block text-gray-700 font-medium mb-2"
+                    >
                       Full Name
                     </label>
                     <div className="relative">
                       <FiUser className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
                       <input
                         type="text"
+                        id="profile-name"
                         name="name"
                         value={profileData.name}
                         onChange={handleProfileChange}
                         className="input-field pl-10"
                         required
+                        autoComplete="name"
                       />
                     </div>
                   </div>
                   <div>
-                    <label className="block text-gray-700 font-medium mb-2">
+                    <label
+                      htmlFor="profile-email"
+                      className="block text-gray-700 font-medium mb-2"
+                    >
                       Email Address
                     </label>
                     <div className="relative">
                       <FiMail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
                       <input
                         type="email"
+                        id="profile-email"
                         name="email"
                         value={profileData.email}
                         onChange={handleProfileChange}
                         className="input-field pl-10"
                         required
+                        autoComplete="email"
                       />
                     </div>
                   </div>
@@ -309,42 +319,57 @@ const Profile = () => {
                   className="space-y-6 max-w-md"
                 >
                   <div>
-                    <label className="block text-gray-700 font-medium mb-2">
+                    <label
+                      htmlFor="currentPassword"
+                      className="block text-gray-700 font-medium mb-2"
+                    >
                       Current Password
                     </label>
                     <input
                       type="password"
+                      id="currentPassword"
                       name="currentPassword"
                       value={passwordData.currentPassword}
                       onChange={handlePasswordChange}
                       className="input-field"
                       required
+                      autoComplete="current-password"
                     />
                   </div>
                   <div>
-                    <label className="block text-gray-700 font-medium mb-2">
+                    <label
+                      htmlFor="newPassword"
+                      className="block text-gray-700 font-medium mb-2"
+                    >
                       New Password
                     </label>
                     <input
                       type="password"
+                      id="newPassword"
                       name="newPassword"
                       value={passwordData.newPassword}
                       onChange={handlePasswordChange}
                       className="input-field"
                       required
+                      autoComplete="new-password"
                     />
                   </div>
                   <div>
-                    <label className="block text-gray-700 font-medium mb-2">
+                    <label
+                      htmlFor="confirmPassword"
+                      className="block text-gray-700 font-medium mb-2"
+                    >
                       Confirm New Password
                     </label>
                     <input
                       type="password"
+                      id="confirmPassword"
                       name="confirmPassword"
                       value={passwordData.confirmPassword}
                       onChange={handlePasswordChange}
                       className="input-field"
                       required
+                      autoComplete="new-password"
                     />
                   </div>
                   <button
