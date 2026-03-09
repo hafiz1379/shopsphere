@@ -32,7 +32,6 @@
 - [Environment Variables](#-environment-variables)
 - [API Endpoints](#-api-endpoints)
 - [Deployment](#-deployment)
-- [Screenshots](#-screenshots)
 - [Roadmap](#-roadmap)
 - [Contributing](#-contributing)
 - [License](#-license)
