@@ -16,8 +16,7 @@
 [🌐 Live Demo](https://shopsphereafg.netlify.app/) · [🐛 Report Bug](https://github.com/hafiz1379/shopsphere/issues) · [✨ Request Feature](https://github.com/hafiz1379/shopsphere/issues)
 
 ---
-
-<img src="https://image2url.com/r2/default/images/1773030093275-02ad3c89-e2d9-43d2-9979-b7e089bf38d8.png" alt="ShopSphere Preview" width="90%" />
+<img width="1903" height="861" alt="Screenshot 2026-03-09 084818" src="https://github.com/user-attachments/assets/7215b534-8bc6-4e67-af95-c84907ecf401" />
 
 </div>
 
