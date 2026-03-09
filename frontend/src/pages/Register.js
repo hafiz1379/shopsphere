@@ -63,12 +63,16 @@ const Register = () => {
         <div className="bg-white rounded-2xl shadow-lg p-8">
           <form onSubmit={handleSubmit} className="space-y-6">
             <div>
-              <label className="block text-gray-700 font-medium mb-2">
+              <label
+                htmlFor="name"
+                className="block text-gray-700 font-medium mb-2"
+              >
                 Full Name
               </label>
               <div className="relative">
                 <FiUser className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
                 <input
+                  id="name"
                   type="text"
                   name="name"
                   value={formData.name}
@@ -77,17 +81,22 @@ const Register = () => {
                   className="input-field pl-10"
                   required
                   disabled={isLoading}
+                  autoComplete="name"
                 />
               </div>
             </div>
 
             <div>
-              <label className="block text-gray-700 font-medium mb-2">
+              <label
+                htmlFor="email"
+                className="block text-gray-700 font-medium mb-2"
+              >
                 Email
               </label>
               <div className="relative">
                 <FiMail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
                 <input
+                  id="email"
                   type="email"
                   name="email"
                   value={formData.email}
@@ -96,17 +105,22 @@ const Register = () => {
                   className="input-field pl-10"
                   required
                   disabled={isLoading}
+                  autoComplete="email"
                 />
               </div>
             </div>
 
             <div>
-              <label className="block text-gray-700 font-medium mb-2">
+              <label
+                htmlFor="password"
+                className="block text-gray-700 font-medium mb-2"
+              >
                 Password
               </label>
               <div className="relative">
                 <FiLock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
                 <input
+                  id="password"
                   type={showPassword ? "text" : "password"}
                   name="password"
                   value={formData.password}
@@ -115,6 +129,7 @@ const Register = () => {
                   className="input-field pl-10 pr-10"
                   required
                   disabled={isLoading}
+                  autoComplete="new-password"
                 />
                 <button
                   type="button"
@@ -127,12 +142,16 @@ const Register = () => {
             </div>
 
             <div>
-              <label className="block text-gray-700 font-medium mb-2">
+              <label
+                htmlFor="confirmPassword"
+                className="block text-gray-700 font-medium mb-2"
+              >
                 Confirm Password
               </label>
               <div className="relative">
                 <FiLock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
                 <input
+                  id="confirmPassword"
                   type="password"
                   name="confirmPassword"
                   value={formData.confirmPassword}
@@ -141,6 +160,7 @@ const Register = () => {
                   className="input-field pl-10"
                   required
                   disabled={isLoading}
+                  autoComplete="new-password"
                 />
               </div>
             </div>

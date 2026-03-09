@@ -161,12 +161,17 @@ const AdminProducts = () => {
         <div className="flex gap-4 mb-6">
           <div className="relative flex-1">
             <FiSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+            <label htmlFor="product-search" className="sr-only">
+              Search products
+            </label>
             <input
               type="text"
+              id="product-search"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search products..."
               className="input-field pl-10"
+              autoComplete="off"
             />
           </div>
         </div>
@@ -291,16 +296,21 @@ const AdminProducts = () => {
               </h2>
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div>
-                  <label className="block text-gray-700 font-medium mb-2">
+                  <label
+                    htmlFor="product-name"
+                    className="block text-gray-700 font-medium mb-2"
+                  >
                     Name
                   </label>
                   <input
                     type="text"
+                    id="product-name"
                     name="name"
                     value={formData.name}
                     onChange={handleInputChange}
                     className="input-field"
                     required
+                    autoComplete="off"
                   />
                 </div>
 
@@ -308,51 +318,73 @@ const AdminProducts = () => {
                   <label className="block text-gray-700 font-medium mb-2">
                     Description
                   </label>
+                  <label
+                    htmlFor="product-description"
+                    className="block text-gray-700 font-medium mb-2"
+                  >
+                    Description
+                  </label>
                   <textarea
+                    id="product-description"
                     name="description"
                     value={formData.description}
                     onChange={handleInputChange}
                     className="input-field h-24"
                     required
+                    autoComplete="off"
                   />
                 </div>
 
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-gray-700 font-medium mb-2">
+                    <label
+                      htmlFor="product-price"
+                      className="block text-gray-700 font-medium mb-2"
+                    >
                       Price
                     </label>
                     <input
                       type="number"
+                      id="product-price"
                       name="price"
                       value={formData.price}
                       onChange={handleInputChange}
                       className="input-field"
                       step="0.01"
                       required
+                      autoComplete="off"
                     />
                   </div>
                   <div>
-                    <label className="block text-gray-700 font-medium mb-2">
+                    <label
+                      htmlFor="product-originalPrice"
+                      className="block text-gray-700 font-medium mb-2"
+                    >
                       Original Price
                     </label>
                     <input
                       type="number"
+                      id="product-originalPrice"
                       name="originalPrice"
                       value={formData.originalPrice}
                       onChange={handleInputChange}
                       className="input-field"
                       step="0.01"
+                      autoComplete="off"
                     />
                   </div>
                 </div>
 
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-gray-700 font-medium mb-2">
+                    <label
+                      htmlFor="product-category"
+                      className="block text-gray-700 font-medium mb-2"
+                    >
                       Category
                     </label>
                     <select
+                      id="product-category"
                       name="category"
                       value={formData.category}
                       onChange={handleInputChange}
@@ -366,55 +398,74 @@ const AdminProducts = () => {
                     </select>
                   </div>
                   <div>
-                    <label className="block text-gray-700 font-medium mb-2">
+                    <label
+                      htmlFor="product-stock"
+                      className="block text-gray-700 font-medium mb-2"
+                    >
                       Stock
                     </label>
                     <input
                       type="number"
+                      id="product-stock"
                       name="stock"
                       value={formData.stock}
                       onChange={handleInputChange}
                       className="input-field"
                       required
+                      autoComplete="off"
                     />
                   </div>
                 </div>
 
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-gray-700 font-medium mb-2">
+                    <label
+                      htmlFor="product-brand"
+                      className="block text-gray-700 font-medium mb-2"
+                    >
                       Brand
                     </label>
                     <input
                       type="text"
+                      id="product-brand"
                       name="brand"
                       value={formData.brand}
                       onChange={handleInputChange}
                       className="input-field"
+                      autoComplete="off"
                     />
                   </div>
                   <div>
-                    <label className="block text-gray-700 font-medium mb-2">
+                    <label
+                      htmlFor="product-discount"
+                      className="block text-gray-700 font-medium mb-2"
+                    >
                       Discount (%)
                     </label>
                     <input
                       type="number"
+                      id="product-discount"
                       name="discount"
                       value={formData.discount}
                       onChange={handleInputChange}
                       className="input-field"
                       min="0"
                       max="100"
+                      autoComplete="off"
                     />
                   </div>
                 </div>
 
                 <div>
-                  <label className="block text-gray-700 font-medium mb-2">
+                  <label
+                    htmlFor="product-images"
+                    className="block text-gray-700 font-medium mb-2"
+                  >
                     Images
                   </label>
                   <input
                     type="file"
+                    id="product-images"
                     onChange={handleImageChange}
                     multiple
                     accept="image/*"
@@ -425,12 +476,15 @@ const AdminProducts = () => {
                 <div className="flex items-center">
                   <input
                     type="checkbox"
+                    id="product-featured"
                     name="featured"
                     checked={formData.featured}
                     onChange={handleInputChange}
                     className="mr-2"
                   />
-                  <label className="text-gray-700">Featured Product</label>
+                  <label htmlFor="product-featured" className="text-gray-700">
+                    Featured Product
+                  </label>
                 </div>
 
                 <div className="flex gap-4 pt-4">

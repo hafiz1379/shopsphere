@@ -48,14 +48,19 @@ const Login = () => {
         <div className="bg-white rounded-2xl shadow-lg p-8">
           <form onSubmit={handleSubmit} className="space-y-6">
             <div>
-              <label className="block text-gray-700 font-medium mb-2">
+              <label
+                htmlFor="email"
+                className="block text-gray-700 font-medium mb-2"
+              >
                 Email
               </label>
               <div className="relative">
                 <FiMail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
                 <input
+                  id="email"
                   type="email"
                   name="email"
+                  autoComplete="email"
                   value={formData.email}
                   onChange={handleChange}
                   placeholder="Enter your email"
@@ -67,14 +72,19 @@ const Login = () => {
             </div>
 
             <div>
-              <label className="block text-gray-700 font-medium mb-2">
+              <label
+                htmlFor="password"
+                className="block text-gray-700 font-medium mb-2"
+              >
                 Password
               </label>
               <div className="relative">
                 <FiLock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
                 <input
+                  id="password"
                   type={showPassword ? "text" : "password"}
                   name="password"
+                  autoComplete="current-password"
                   value={formData.password}
                   onChange={handleChange}
                   placeholder="Enter your password"
@@ -93,8 +103,14 @@ const Login = () => {
             </div>
 
             <div className="flex items-center justify-between">
-              <label className="flex items-center">
-                <input type="checkbox" className="rounded text-primary-600" />
+              <label htmlFor="remember" className="flex items-center">
+                <input
+                  id="remember"
+                  name="remember"
+                  type="checkbox"
+                  autoComplete="off"
+                  className="rounded text-primary-600"
+                />
                 <span className="ml-2 text-gray-600 text-sm">Remember me</span>
               </label>
             </div>

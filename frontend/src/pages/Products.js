@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
-import { FiFilter, FiGrid, FiList, FiSearch, FiX } from "react-icons/fi";
+import { FiFilter, FiGrid, FiList, FiSearch } from "react-icons/fi";
 import ProductCard from "../components/common/ProductCard";
 import Loading from "../components/common/Loading";
 import { productAPI } from "../services/api";
@@ -33,12 +33,10 @@ const Products = () => {
     "Accessories",
   ];
 
-  // Sync searchQuery state with URL parameters (e.g., from header search)
   useEffect(() => {
     const urlSearch = searchParams.get("search");
     if (urlSearch) {
       setSearchQuery(urlSearch);
-      // Ensure pagination resets when a new search comes from the URL
       setPagination((prev) => ({ ...prev, page: 1 }));
     }
   }, [searchParams]);
@@ -109,6 +107,8 @@ const Products = () => {
           <div className="relative flex-1">
             <FiSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
             <input
+              id="search"
+              name="search"
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
@@ -164,6 +164,8 @@ const Products = () => {
               <h4 className="font-medium text-gray-700 mb-3">Price Range</h4>
               <div className="flex gap-2 mb-3">
                 <input
+                  id="minPrice"
+                  name="minPrice"
                   type="number"
                   placeholder="Min"
                   value={priceRange.min}
@@ -173,6 +175,8 @@ const Products = () => {
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"
                 />
                 <input
+                  id="maxPrice"
+                  name="maxPrice"
                   type="number"
                   placeholder="Max"
                   value={priceRange.max}
@@ -208,6 +212,8 @@ const Products = () => {
 
             <div className="flex items-center gap-4">
               <select
+                id="sort"
+                name="sort"
                 value={sortBy}
                 onChange={(e) => setSortBy(e.target.value)}
                 className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"

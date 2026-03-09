@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { FiEdit2, FiTrash2, FiSearch, FiX } from "react-icons/fi";
+import { FiEdit2, FiTrash2, FiX } from "react-icons/fi";
 import { toast } from "react-toastify";
 import { userAPI } from "../../services/api";
 import Loading from "../../components/common/Loading";
@@ -221,36 +221,50 @@ const AdminUsers = () => {
               </div>
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div>
-                  <label className="block text-gray-700 font-medium mb-2">
+                  <label
+                    htmlFor="user-name"
+                    className="block text-gray-700 font-medium mb-2"
+                  >
                     Name
                   </label>
                   <input
                     type="text"
+                    id="user-name"
                     name="name"
                     value={formData.name}
                     onChange={handleInputChange}
                     className="input-field"
                     required
+                    autoComplete="off"
                   />
                 </div>
                 <div>
-                  <label className="block text-gray-700 font-medium mb-2">
+                  <label
+                    htmlFor="user-email"
+                    className="block text-gray-700 font-medium mb-2"
+                  >
                     Email
                   </label>
                   <input
                     type="email"
+                    id="user-email"
                     name="email"
                     value={formData.email}
                     onChange={handleInputChange}
                     className="input-field"
                     required
+                    autoComplete="off"
                   />
                 </div>
                 <div>
-                  <label className="block text-gray-700 font-medium mb-2">
+                  <label
+                    htmlFor="user-role"
+                    className="block text-gray-700 font-medium mb-2"
+                  >
                     Role
                   </label>
                   <select
+                    id="user-role"
                     name="role"
                     value={formData.role}
                     onChange={handleInputChange}
@@ -263,12 +277,15 @@ const AdminUsers = () => {
                 <div className="flex items-center">
                   <input
                     type="checkbox"
+                    id="user-isActive"
                     name="isActive"
                     checked={formData.isActive}
                     onChange={handleInputChange}
                     className="mr-2"
                   />
-                  <label className="text-gray-700">Active Account</label>
+                  <label htmlFor="user-isActive" className="text-gray-700">
+                    Active Account
+                  </label>
                 </div>
                 <div className="flex gap-4 pt-4">
                   <button

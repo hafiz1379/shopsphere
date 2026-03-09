@@ -144,7 +144,9 @@ const Home = () => {
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center max-w-md mx-auto">
             <input
+              id="email"
               type="email"
+              autoComplete="email"
               placeholder="Enter your email"
               className="input-field flex-1"
             />
