@@ -1,79 +1,56 @@
 import React, { useState, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
-import { FiFilter, FiGrid, FiList, FiSearch } from "react-icons/fi";
+import { FiSearch, FiFilter, FiX, FiChevronDown } from "react-icons/fi";
+import { productAPI } from "../services/api";
 import ProductCard from "../components/common/ProductCard";
 import Loading from "../components/common/Loading";
-import { productAPI } from "../services/api";
+
+const categories = [
+  "All",
+  "Electronics",
+  "Fashion",
+  "Sports",
+  "Home",
+  "Food",
+  "Accessories",
+];
+const sortOptions = [
+  { value: "newest", label: "Newest" },
+  { value: "price-asc", label: "Price: Low to High" },
+  { value: "price-desc", label: "Price: High to Low" },
+  { value: "rating", label: "Top Rated" },
+];
 
 const Products = () => {
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [viewMode, setViewMode] = useState("grid");
-  const [selectedCategory, setSelectedCategory] = useState("All");
-  const [sortBy, setSortBy] = useState("newest");
-  const [searchQuery, setSearchQuery] = useState(
-    searchParams.get("search") || "",
-  );
+  const [totalPages, setTotalPages] = useState(1);
   const [showFilters, setShowFilters] = useState(false);
-  const [priceRange, setPriceRange] = useState({ min: "", max: "" });
-  const [pagination, setPagination] = useState({
-    page: 1,
-    pages: 1,
-    total: 0,
-  });
 
-  const categories = [
-    "All",
-    "Electronics",
-    "Fashion",
-    "Sports",
-    "Home",
-    "Food",
-    "Accessories",
-  ];
+  const currentSearch = searchParams.get("search") || "";
+  const currentCategory = searchParams.get("category") || "All";
+  const currentSort = searchParams.get("sort") || "newest";
+  const currentPage = parseInt(searchParams.get("page")) || 1;
 
-  useEffect(() => {
-    const urlSearch = searchParams.get("search");
-    if (urlSearch) {
-      setSearchQuery(urlSearch);
-      setPagination((prev) => ({ ...prev, page: 1 }));
-    }
-  }, [searchParams]);
+  const [search, setSearch] = useState(currentSearch);
 
   useEffect(() => {
     fetchProducts();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedCategory, sortBy, pagination.page, searchQuery]);
+  }, [searchParams]);
 
   const fetchProducts = async () => {
     try {
       setLoading(true);
-      const params = {
-        page: pagination.page,
-        limit: 12,
-        sort: sortBy,
-      };
+      const params = { page: currentPage, limit: 12 };
+      if (currentSearch) params.search = currentSearch;
+      if (currentCategory !== "All") params.category = currentCategory;
+      if (currentSort) params.sort = currentSort;
+      if (searchParams.get("featured")) params.featured = true;
 
-      if (selectedCategory !== "All") {
-        params.category = selectedCategory;
-      }
-
-      if (searchQuery) {
-        params.search = searchQuery;
-      }
-
-      if (priceRange.min) {
-        params.minPrice = priceRange.min;
-      }
-
-      if (priceRange.max) {
-        params.maxPrice = priceRange.max;
-      }
-
-      const response = await productAPI.getAll(params);
-      setProducts(response.data.data);
-      setPagination(response.data.pagination);
+      const { data } = await productAPI.getAll(params);
+      setProducts(data.data || data.products || []);
+      setTotalPages(data.totalPages || data.pages || 1);
     } catch (error) {
       console.error("Error fetching products:", error);
     } finally {
@@ -81,222 +58,167 @@ const Products = () => {
     }
   };
 
-  const handleSearch = (e) => {
-    e.preventDefault();
-    setPagination((prev) => ({ ...prev, page: 1 }));
-    fetchProducts();
+  const updateFilter = (key, value) => {
+    const newParams = new URLSearchParams(searchParams);
+    if (value && value !== "All") {
+      newParams.set(key, value);
+    } else {
+      newParams.delete(key);
+    }
+    newParams.set("page", "1");
+    setSearchParams(newParams);
   };
 
-  const handlePriceFilter = () => {
-    setPagination((prev) => ({ ...prev, page: 1 }));
-    fetchProducts();
+  const handleSearch = (e) => {
+    e.preventDefault();
+    updateFilter("search", search);
   };
 
   const clearFilters = () => {
-    setSelectedCategory("All");
-    setSearchQuery("");
-    setPriceRange({ min: "", max: "" });
-    setSortBy("newest");
-    setPagination((prev) => ({ ...prev, page: 1 }));
+    setSearch("");
+    setSearchParams({});
   };
 
+  const hasActiveFilters =
+    currentSearch || currentCategory !== "All" || currentSort !== "newest";
+
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      <div className="mb-8">
-        <form onSubmit={handleSearch} className="flex gap-4">
-          <div className="relative flex-1">
-            <FiSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
-            <input
-              id="search"
-              name="search"
-              type="text"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search products..."
-              className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
-            />
-          </div>
-          <button type="submit" className="btn-primary">
-            Search
-          </button>
-        </form>
+    <div className="min-h-screen bg-gray-50 animate-fade-in">
+      {/* Page Header */}
+      <div className="bg-white border-b border-gray-100">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <h1 className="text-3xl font-bold text-gray-900">
+            {currentSearch
+              ? `Results for "${currentSearch}"`
+              : currentCategory !== "All"
+                ? currentCategory
+                : "All Products"}
+          </h1>
+          <p className="text-gray-500 mt-1">
+            {!loading && `${products.length} products found`}
+          </p>
+        </div>
       </div>
 
-      <div className="flex flex-col md:flex-row gap-8">
-        <aside
-          className={`md:w-64 ${showFilters ? "block" : "hidden md:block"}`}
-        >
-          <div className="bg-white rounded-xl shadow-md p-6">
-            <div className="flex justify-between items-center mb-4">
-              <h3 className="text-lg font-semibold text-gray-800">Filters</h3>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Filter Bar */}
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 mb-8">
+          <div className="flex flex-wrap items-center gap-4">
+            {/* Search */}
+            <form onSubmit={handleSearch} className="flex-1 min-w-[200px]">
+              <div className="relative">
+                <FiSearch className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400" />
+                <input
+                  type="text"
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  placeholder="Search products..."
+                  className="w-full pl-10 pr-4 py-2.5 bg-gray-50 rounded-xl border-0 text-sm focus:bg-white focus:ring-2 focus:ring-primary-500/20 outline-none transition-all"
+                />
+              </div>
+            </form>
+
+            {/* Sort */}
+            <div className="relative">
+              <select
+                value={currentSort}
+                onChange={(e) => updateFilter("sort", e.target.value)}
+                className="appearance-none bg-gray-50 text-sm px-4 py-2.5 pr-10 rounded-xl focus:ring-2 focus:ring-primary-500/20 outline-none cursor-pointer"
+              >
+                {sortOptions.map((opt) => (
+                  <option key={opt.value} value={opt.value}>
+                    {opt.label}
+                  </option>
+                ))}
+              </select>
+              <FiChevronDown
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none"
+                size={14}
+              />
+            </div>
+
+            {/* Filter Toggle (Mobile) */}
+            <button
+              onClick={() => setShowFilters(!showFilters)}
+              className="lg:hidden flex items-center gap-2 px-4 py-2.5 bg-gray-50 rounded-xl text-sm font-medium text-gray-700"
+            >
+              <FiFilter size={16} /> Filters
+            </button>
+
+            {hasActiveFilters && (
               <button
                 onClick={clearFilters}
-                className="text-sm text-primary-600 hover:underline"
+                className="flex items-center gap-1 px-3 py-2 text-sm text-red-600 hover:bg-red-50 rounded-lg transition-colors"
               >
-                Clear All
+                <FiX size={14} /> Clear
               </button>
-            </div>
-
-            <div className="mb-6">
-              <h4 className="font-medium text-gray-700 mb-3">Categories</h4>
-              <ul className="space-y-2">
-                {categories.map((category) => (
-                  <li key={category}>
-                    <button
-                      onClick={() => {
-                        setSelectedCategory(category);
-                        setPagination((prev) => ({ ...prev, page: 1 }));
-                      }}
-                      className={`w-full text-left px-3 py-2 rounded-lg transition-colors ${
-                        selectedCategory === category
-                          ? "bg-primary-100 text-primary-600"
-                          : "text-gray-600 hover:bg-gray-100"
-                      }`}
-                    >
-                      {category}
-                    </button>
-                  </li>
-                ))}
-              </ul>
-            </div>
-
-            <div>
-              <h4 className="font-medium text-gray-700 mb-3">Price Range</h4>
-              <div className="flex gap-2 mb-3">
-                <input
-                  id="minPrice"
-                  name="minPrice"
-                  type="number"
-                  placeholder="Min"
-                  value={priceRange.min}
-                  onChange={(e) =>
-                    setPriceRange({ ...priceRange, min: e.target.value })
-                  }
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"
-                />
-                <input
-                  id="maxPrice"
-                  name="maxPrice"
-                  type="number"
-                  placeholder="Max"
-                  value={priceRange.max}
-                  onChange={(e) =>
-                    setPriceRange({ ...priceRange, max: e.target.value })
-                  }
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"
-                />
-              </div>
-              <button
-                onClick={handlePriceFilter}
-                className="w-full btn-secondary text-sm"
-              >
-                Apply
-              </button>
-            </div>
-          </div>
-        </aside>
-
-        <main className="flex-1">
-          <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
-            <div className="flex items-center gap-4">
-              <button
-                onClick={() => setShowFilters(!showFilters)}
-                className="md:hidden flex items-center gap-2 px-4 py-2 bg-white rounded-lg shadow"
-              >
-                <FiFilter /> Filters
-              </button>
-              <p className="text-gray-600">
-                Showing {products.length} of {pagination.total} products
-              </p>
-            </div>
-
-            <div className="flex items-center gap-4">
-              <select
-                id="sort"
-                name="sort"
-                value={sortBy}
-                onChange={(e) => setSortBy(e.target.value)}
-                className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
-              >
-                <option value="newest">Newest</option>
-                <option value="price-low">Price: Low to High</option>
-                <option value="price-high">Price: High to Low</option>
-                <option value="rating">Highest Rated</option>
-              </select>
-
-              <div className="hidden sm:flex items-center gap-2">
-                <button
-                  onClick={() => setViewMode("grid")}
-                  className={`p-2 rounded ${viewMode === "grid" ? "bg-primary-100 text-primary-600" : "text-gray-400"}`}
-                >
-                  <FiGrid size={20} />
-                </button>
-                <button
-                  onClick={() => setViewMode("list")}
-                  className={`p-2 rounded ${viewMode === "list" ? "bg-primary-100 text-primary-600" : "text-gray-400"}`}
-                >
-                  <FiList size={20} />
-                </button>
-              </div>
-            </div>
+            )}
           </div>
 
-          {loading ? (
-            <Loading />
-          ) : (
-            <>
-              <div
-                className={`grid gap-6 ${
-                  viewMode === "grid"
-                    ? "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3"
-                    : "grid-cols-1"
+          {/* Category Tags */}
+          <div
+            className={`flex flex-wrap gap-2 mt-4 ${showFilters ? "block" : "hidden lg:flex"}`}
+          >
+            {categories.map((cat) => (
+              <button
+                key={cat}
+                onClick={() => updateFilter("category", cat)}
+                className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+                  currentCategory === cat
+                    ? "bg-primary-600 text-white shadow-md shadow-primary-500/25"
+                    : "bg-gray-100 text-gray-600 hover:bg-gray-200"
                 }`}
               >
-                {products.map((product) => (
-                  <ProductCard key={product._id} product={product} />
+                {cat}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Products Grid */}
+        {loading ? (
+          <Loading type="skeleton" count={8} />
+        ) : products.length === 0 ? (
+          <div className="text-center py-20">
+            <div className="text-6xl mb-4">🔍</div>
+            <h3 className="text-xl font-semibold text-gray-900 mb-2">
+              No products found
+            </h3>
+            <p className="text-gray-500 mb-6">
+              Try adjusting your search or filter criteria
+            </p>
+            <button onClick={clearFilters} className="btn-primary">
+              Clear Filters
+            </button>
+          </div>
+        ) : (
+          <>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+              {products.map((product) => (
+                <ProductCard key={product._id} product={product} />
+              ))}
+            </div>
+
+            {/* Pagination */}
+            {totalPages > 1 && (
+              <div className="flex justify-center items-center gap-2 mt-12">
+                {[...Array(totalPages)].map((_, i) => (
+                  <button
+                    key={i}
+                    onClick={() => updateFilter("page", String(i + 1))}
+                    className={`w-10 h-10 rounded-xl text-sm font-medium transition-all ${
+                      currentPage === i + 1
+                        ? "bg-primary-600 text-white shadow-md"
+                        : "bg-white text-gray-600 border border-gray-200 hover:bg-gray-50"
+                    }`}
+                  >
+                    {i + 1}
+                  </button>
                 ))}
               </div>
-
-              {products.length === 0 && (
-                <div className="text-center py-12">
-                  <p className="text-gray-500 text-lg">No products found.</p>
-                </div>
-              )}
-
-              {pagination.pages > 1 && (
-                <div className="flex justify-center mt-8 gap-2">
-                  <button
-                    onClick={() =>
-                      setPagination({
-                        ...pagination,
-                        page: pagination.page - 1,
-                      })
-                    }
-                    disabled={pagination.page === 1}
-                    className="px-4 py-2 border border-gray-300 rounded-lg disabled:opacity-50"
-                  >
-                    Previous
-                  </button>
-                  <span className="px-4 py-2">
-                    Page {pagination.page} of {pagination.pages}
-                  </span>
-                  <button
-                    onClick={() =>
-                      setPagination({
-                        ...pagination,
-                        page: pagination.page + 1,
-                      })
-                    }
-                    disabled={pagination.page === pagination.pages}
-                    className="px-4 py-2 border border-gray-300 rounded-lg disabled:opacity-50"
-                  >
-                    Next
-                  </button>
-                </div>
-              )}
-            </>
-          )}
-        </main>
+            )}
+          </>
+        )}
       </div>
     </div>
   );
