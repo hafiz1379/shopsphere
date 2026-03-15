@@ -1,19 +1,20 @@
 import React from "react";
 import { Link } from "react-router-dom";
+import { FiArrowLeft } from "react-icons/fi";
 
 const NotFound = () => {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50">
+    <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4 animate-fade-in">
       <div className="text-center">
-        <h1 className="text-9xl font-bold text-primary-600">404</h1>
-        <h2 className="text-3xl font-semibold text-gray-800 mt-4">
+        <h1 className="text-8xl font-extrabold gradient-text mb-4">404</h1>
+        <h2 className="text-2xl font-bold text-gray-900 mb-2">
           Page Not Found
         </h2>
-        <p className="text-gray-600 mt-2 mb-8">
+        <p className="text-gray-500 mb-8">
           The page you're looking for doesn't exist or has been moved.
         </p>
-        <Link to="/" className="btn-primary">
-          Go Back Home
+        <Link to="/" className="btn-primary inline-flex items-center gap-2">
+          <FiArrowLeft size={18} /> Back to Home
         </Link>
       </div>
     </div>
