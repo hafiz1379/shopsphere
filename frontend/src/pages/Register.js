@@ -12,8 +12,7 @@ const Register = () => {
     confirmPassword: "",
   });
   const [showPassword, setShowPassword] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
-
+  const [loading, setLoading] = useState(false);
   const { register } = useAuth();
   const navigate = useNavigate();
 
@@ -23,169 +22,154 @@ const Register = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     if (formData.password !== formData.confirmPassword) {
       toast.error("Passwords do not match");
       return;
     }
-
     if (formData.password.length < 6) {
       toast.error("Password must be at least 6 characters");
       return;
     }
-
-    setIsLoading(true);
-
-    const result = await register(
-      formData.name,
-      formData.email,
-      formData.password,
-    );
-
-    if (result.success) {
-      toast.success("Account created successfully!");
-      navigate("/");
-    } else {
-      toast.error(result.message);
+    setLoading(true);
+    try {
+      const result = await register(
+        formData.name,
+        formData.email,
+        formData.password,
+      );
+      if (result.success) {
+        toast.success("Account created successfully!");
+        navigate("/");
+      } else {
+        toast.error(result.message || "Registration failed");
+      }
+    } catch (error) {
+      toast.error("Something went wrong");
+    } finally {
+      setLoading(false);
     }
-
-    setIsLoading(false);
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4">
-      <div className="max-w-md w-full">
+    <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4 py-12 animate-fade-in">
+      <div className="w-full max-w-md">
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-800">Create Account</h1>
-          <p className="text-gray-600 mt-2">Join ShopSphere today</p>
+          <Link to="/" className="inline-flex items-center gap-2 mb-6">
+            <div className="w-12 h-12 bg-gradient-to-br from-primary-600 to-primary-400 rounded-xl flex items-center justify-center shadow-lg shadow-primary-500/25">
+              <span className="text-white font-bold text-xl">S</span>
+            </div>
+          </Link>
+          <h1 className="text-3xl font-bold text-gray-900">Create Account</h1>
+          <p className="text-gray-500 mt-2">Join ShopSphere today</p>
         </div>
 
-        <div className="bg-white rounded-2xl shadow-lg p-8">
-          <form onSubmit={handleSubmit} className="space-y-6">
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8">
+          <form onSubmit={handleSubmit} className="space-y-5">
             <div>
-              <label
-                htmlFor="name"
-                className="block text-gray-700 font-medium mb-2"
-              >
+              <label className="block text-sm font-medium text-gray-700 mb-1.5">
                 Full Name
               </label>
               <div className="relative">
-                <FiUser className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                <FiUser className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
                 <input
-                  id="name"
                   type="text"
                   name="name"
                   value={formData.name}
                   onChange={handleChange}
                   placeholder="Enter your name"
-                  className="input-field pl-10"
+                  className="input-field pl-11"
                   required
-                  disabled={isLoading}
-                  autoComplete="name"
                 />
               </div>
             </div>
 
             <div>
-              <label
-                htmlFor="email"
-                className="block text-gray-700 font-medium mb-2"
-              >
-                Email
+              <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                Email Address
               </label>
               <div className="relative">
-                <FiMail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                <FiMail className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
                 <input
-                  id="email"
                   type="email"
                   name="email"
                   value={formData.email}
                   onChange={handleChange}
                   placeholder="Enter your email"
-                  className="input-field pl-10"
+                  className="input-field pl-11"
                   required
-                  disabled={isLoading}
-                  autoComplete="email"
                 />
               </div>
             </div>
 
             <div>
-              <label
-                htmlFor="password"
-                className="block text-gray-700 font-medium mb-2"
-              >
+              <label className="block text-sm font-medium text-gray-700 mb-1.5">
                 Password
               </label>
               <div className="relative">
-                <FiLock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                <FiLock className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
                 <input
-                  id="password"
                   type={showPassword ? "text" : "password"}
                   name="password"
                   value={formData.password}
                   onChange={handleChange}
                   placeholder="Create a password"
-                  className="input-field pl-10 pr-10"
+                  className="input-field pl-11 pr-11"
                   required
-                  disabled={isLoading}
-                  autoComplete="new-password"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400"
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
                 >
-                  {showPassword ? <FiEyeOff /> : <FiEye />}
+                  {showPassword ? <FiEyeOff size={18} /> : <FiEye size={18} />}
                 </button>
               </div>
             </div>
 
             <div>
-              <label
-                htmlFor="confirmPassword"
-                className="block text-gray-700 font-medium mb-2"
-              >
+              <label className="block text-sm font-medium text-gray-700 mb-1.5">
                 Confirm Password
               </label>
               <div className="relative">
-                <FiLock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                <FiLock className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
                 <input
-                  id="confirmPassword"
                   type="password"
                   name="confirmPassword"
                   value={formData.confirmPassword}
                   onChange={handleChange}
                   placeholder="Confirm your password"
-                  className="input-field pl-10"
+                  className="input-field pl-11"
                   required
-                  disabled={isLoading}
-                  autoComplete="new-password"
                 />
               </div>
             </div>
 
             <button
               type="submit"
-              disabled={isLoading}
-              className="w-full btn-primary py-3 disabled:opacity-50 disabled:cursor-not-allowed"
+              disabled={loading}
+              className="btn-primary w-full"
             >
-              {isLoading ? "Creating Account..." : "Create Account"}
+              {loading ? (
+                <span className="flex items-center justify-center gap-2">
+                  <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
+                  Creating Account...
+                </span>
+              ) : (
+                "Create Account"
+              )}
             </button>
           </form>
-
-          <div className="mt-6 text-center">
-            <p className="text-gray-600">
-              Already have an account?{" "}
-              <Link
-                to="/login"
-                className="text-primary-600 font-medium hover:underline"
-              >
-                Sign in
-              </Link>
-            </p>
-          </div>
         </div>
+
+        <p className="text-center mt-6 text-gray-500 text-sm">
+          Already have an account?{" "}
+          <Link
+            to="/login"
+            className="text-primary-600 font-semibold hover:text-primary-700"
+          >
+            Sign In
+          </Link>
+        </p>
       </div>
     </div>
   );
