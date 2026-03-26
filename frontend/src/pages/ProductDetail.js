@@ -30,22 +30,29 @@ const ProductDetail = () => {
   const [selectedImage, setSelectedImage] = useState(0);
   const [quantity, setQuantity] = useState(1);
   const [addingToCart, setAddingToCart] = useState(false);
+  const [reviewLoading, setReviewLoading] = useState(false);
+
+  const [reviewForm, setReviewForm] = useState({
+    rating: 5,
+    comment: "",
+  });
 
   useEffect(() => {
-    const fetchProduct = async () => {
-      try {
-        setLoading(true);
-        const { data } = await productAPI.getById(id);
-        setProduct(data.data || data.product || data);
-      } catch (error) {
-        toast.error("Product not found");
-        navigate("/products");
-      } finally {
-        setLoading(false);
-      }
-    };
     fetchProduct();
-  }, [id, navigate]);
+  }, [id]);
+
+  const fetchProduct = async () => {
+    try {
+      setLoading(true);
+      const { data } = await productAPI.getById(id);
+      setProduct(data.data || data.product || data);
+    } catch (error) {
+      toast.error("Product not found");
+      navigate("/products");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleAddToCart = async () => {
     if (!user) {
@@ -53,12 +60,13 @@ const ProductDetail = () => {
       navigate("/login");
       return;
     }
+
     setAddingToCart(true);
     const result = await addToCart(product._id, quantity);
     if (result.success) {
       toast.success("Added to cart!");
     } else {
-      toast.error(result.message);
+      toast.error(result.message || "Failed to add to cart");
     }
     setAddingToCart(false);
   };
@@ -72,18 +80,54 @@ const ProductDetail = () => {
     toggleWishlist(product._id);
   };
 
+  const handleReviewSubmit = async (e) => {
+    e.preventDefault();
+
+    if (!user) {
+      toast.error("Please login to submit a review");
+      navigate("/login");
+      return;
+    }
+
+    try {
+      setReviewLoading(true);
+
+      if (productAPI.createReview) {
+        await productAPI.createReview(product._id, reviewForm);
+      } else if (productAPI.addReview) {
+        await productAPI.addReview(product._id, reviewForm);
+      } else {
+        toast.error("Review API is not configured in frontend");
+        return;
+      }
+
+      toast.success("Review submitted successfully");
+      setReviewForm({ rating: 5, comment: "" });
+      fetchProduct();
+    } catch (error) {
+      toast.error(error.response?.data?.message || "Failed to submit review");
+    } finally {
+      setReviewLoading(false);
+    }
+  };
+
   if (loading) return <Loading />;
   if (!product) return null;
 
   const inWishlist = isInWishlist(product._id);
+
   const images =
     product.images?.length > 0
       ? product.images
       : [{ url: "https://via.placeholder.com/600" }];
 
+  const ratingValue =
+    product.ratings ?? product.rating ?? product.averageRating ?? 0;
+
+  const reviewCount = product.numReviews ?? product.reviews?.length ?? 0;
+
   return (
     <div className="min-h-screen bg-gray-50 animate-fade-in">
-      {/* Breadcrumb */}
       <div className="bg-white border-b border-gray-100">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <nav className="flex items-center gap-2 text-sm text-gray-500">
@@ -107,7 +151,6 @@ const ProductDetail = () => {
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 lg:py-12">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16">
-          {/* Images */}
           <div className="space-y-4">
             <div className="aspect-square bg-white rounded-2xl overflow-hidden border border-gray-100">
               <img
@@ -116,6 +159,7 @@ const ProductDetail = () => {
                 className="w-full h-full object-cover"
               />
             </div>
+
             {images.length > 1 && (
               <div className="flex gap-3 overflow-x-auto pb-2">
                 {images.map((img, i) => (
@@ -139,16 +183,15 @@ const ProductDetail = () => {
             )}
           </div>
 
-          {/* Product Info */}
           <div>
             <p className="text-sm text-primary-600 font-semibold uppercase tracking-wide mb-2">
               {product.category}
             </p>
+
             <h1 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-4">
               {product.name}
             </h1>
 
-            {/* Rating */}
             <div className="flex items-center gap-3 mb-6">
               <div className="flex items-center gap-1">
                 {[...Array(5)].map((_, i) => (
@@ -156,19 +199,21 @@ const ProductDetail = () => {
                     key={i}
                     size={18}
                     className={
-                      i < Math.round(product.ratings || 0)
+                      i < Math.round(ratingValue)
                         ? "text-accent-400 fill-current"
                         : "text-gray-300"
                     }
                   />
                 ))}
               </div>
+              <span className="text-sm font-medium text-gray-800">
+                {Number(ratingValue).toFixed(1)}
+              </span>
               <span className="text-sm text-gray-500">
-                ({product.numReviews || 0} reviews)
+                ({reviewCount} reviews)
               </span>
             </div>
 
-            {/* Price */}
             <div className="flex items-center gap-4 mb-6">
               <span className="text-4xl font-bold text-gray-900">
                 ${product.price?.toFixed(2)}
@@ -192,12 +237,10 @@ const ProductDetail = () => {
                 )}
             </div>
 
-            {/* Description */}
             <p className="text-gray-600 leading-relaxed mb-8">
               {product.description}
             </p>
 
-            {/* Stock */}
             <div className="mb-6">
               {product.stock > 0 ? (
                 <span className="inline-flex items-center gap-2 text-sm text-green-700 bg-green-50 px-3 py-1.5 rounded-lg">
@@ -212,7 +255,6 @@ const ProductDetail = () => {
               )}
             </div>
 
-            {/* Quantity + Actions */}
             {product.stock > 0 && (
               <div className="space-y-4 mb-8">
                 <div className="flex items-center gap-4">
@@ -249,6 +291,7 @@ const ProductDetail = () => {
                     <FiShoppingCart size={18} />
                     {addingToCart ? "Adding..." : "Add to Cart"}
                   </button>
+
                   <button
                     onClick={handleToggleWishlist}
                     className={`p-3.5 rounded-xl border-2 transition-all ${
@@ -266,7 +309,6 @@ const ProductDetail = () => {
               </div>
             )}
 
-            {/* Trust Badges */}
             <div className="grid grid-cols-3 gap-4 pt-8 border-t border-gray-100">
               {[
                 { icon: FiTruck, label: "Free Shipping" },
@@ -286,6 +328,120 @@ const ProductDetail = () => {
                 </div>
               ))}
             </div>
+          </div>
+        </div>
+
+        <div className="mt-14 grid grid-cols-1 lg:grid-cols-3 gap-8">
+          <div className="lg:col-span-2 bg-white rounded-2xl border border-gray-100 p-6">
+            <h2 className="text-2xl font-bold text-gray-900 mb-6">
+              Customer Reviews
+            </h2>
+
+            {product.reviews && product.reviews.length > 0 ? (
+              <div className="space-y-5">
+                {product.reviews.map((review, index) => (
+                  <div
+                    key={review._id || index}
+                    className="border-b border-gray-100 pb-5 last:border-0 last:pb-0"
+                  >
+                    <div className="flex items-center justify-between gap-4 mb-2">
+                      <div>
+                        <p className="font-semibold text-gray-900">
+                          {review.name || review.user?.name || "User"}
+                        </p>
+                        <p className="text-xs text-gray-500">
+                          {review.createdAt
+                            ? new Date(review.createdAt).toLocaleDateString()
+                            : ""}
+                        </p>
+                      </div>
+
+                      <div className="flex items-center gap-1">
+                        {[...Array(5)].map((_, i) => (
+                          <FiStar
+                            key={i}
+                            size={15}
+                            className={
+                              i < Math.round(review.rating || 0)
+                                ? "text-accent-400 fill-current"
+                                : "text-gray-300"
+                            }
+                          />
+                        ))}
+                      </div>
+                    </div>
+
+                    <p className="text-gray-600 leading-relaxed">
+                      {review.comment}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="text-gray-500">No reviews yet.</p>
+            )}
+          </div>
+
+          <div className="bg-white rounded-2xl border border-gray-100 p-6 h-fit">
+            <h3 className="text-xl font-bold text-gray-900 mb-5">
+              Write a Review
+            </h3>
+
+            <form onSubmit={handleReviewSubmit} className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Rating
+                </label>
+                <div className="flex items-center gap-2">
+                  {[1, 2, 3, 4, 5].map((star) => (
+                    <button
+                      key={star}
+                      type="button"
+                      onClick={() =>
+                        setReviewForm({ ...reviewForm, rating: star })
+                      }
+                      className="transition-transform hover:scale-110"
+                    >
+                      <FiStar
+                        size={24}
+                        className={
+                          star <= reviewForm.rating
+                            ? "text-accent-400 fill-current"
+                            : "text-gray-300"
+                        }
+                      />
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Comment
+                </label>
+                <textarea
+                  rows="5"
+                  value={reviewForm.comment}
+                  onChange={(e) =>
+                    setReviewForm({
+                      ...reviewForm,
+                      comment: e.target.value,
+                    })
+                  }
+                  placeholder="Share your experience with this product..."
+                  className="input-field resize-none"
+                  required
+                />
+              </div>
+
+              <button
+                type="submit"
+                disabled={reviewLoading}
+                className="btn-primary w-full"
+              >
+                {reviewLoading ? "Submitting..." : "Submit Review"}
+              </button>
+            </form>
           </div>
         </div>
       </div>
